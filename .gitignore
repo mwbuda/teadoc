@@ -1,0 +1,5 @@
+.metadata/**
+**/.settings/**
+**/modules/**
+**/.project
+**/.classpath
