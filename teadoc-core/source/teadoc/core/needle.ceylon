@@ -9,8 +9,13 @@ import ceylon.language.meta.model { ... }
 alias Injection => Object(InjectRequest) ;
 alias PostProcessing => Object(Object, InjectRequest) ;
 
-class InjectRequest(shared String key, shared TeadocPattern pattern, shared TeadocContext context) {
-
+class InjectRequest(
+	shared String key, 
+	shared TeadocPattern pattern, 
+	shared [String*] keyVariables,
+	shared TeadocContext context
+) {
+	//nothing here...
 }
 
 interface Needle {
