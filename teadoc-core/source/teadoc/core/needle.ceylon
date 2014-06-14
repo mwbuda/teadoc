@@ -10,15 +10,15 @@ alias Injection => Object(InjectRequest) ;
 alias PostProcessing => Object(Object, InjectRequest) ;
 
 class InjectRequest(
-	shared String key, 
+	shared TeadocKey key, 
 	shared TeadocPattern pattern, 
-	shared [String*] keyVariables,
 	shared TeadocContext context
 ) {
-	//nothing here...
+	shared [String*] keyVariables => pattern.extractFromKey(key) ;
 }
 
-interface Needle {
+interface Needle 
+satisfies Identifiable {
 	shared formal Object inject(InjectRequest rq) ;
 	shared Needle with(PostProcessor | PostProcessing pp) => PostProcessed(this,{pp}) ;
 }
@@ -40,6 +40,13 @@ class FixedValue(Object v)
 satisfies Needle 
 {
 	shared actual Object inject(InjectRequest rq) => v ;
+}
+
+class ErrorInjection()
+satisfies Needle {
+	shared actual Object inject(InjectRequest rq) {
+		throw InvocationException("erroroneous needle cannot be injected") ;
+	}
 }
 
 class PostProcessed(Needle wrapped, {PostProcessor | PostProcessing+} postProcessors)
