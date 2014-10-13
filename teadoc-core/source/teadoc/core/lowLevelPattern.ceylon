@@ -20,7 +20,7 @@ import ceylon.collection {
  
  This implemenation is based (loosely) upon the algorithms 1st chapter of 'Beutifal Code' (pub O'Reilly Media Inc; 2007); by Brian Kernigan
  note that it omits the start/end symbols; we are expecting whole string matches here.
- "
+"
 class LowLevelPattern(shared String pattern) {
 	shared Character wildcard = '.' ;
 	shared Character zeroOrMore = '*' ;
