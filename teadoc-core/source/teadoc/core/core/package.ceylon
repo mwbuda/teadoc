@@ -3,4 +3,4 @@
  
  originally written & maintained by m.William buda
  "
-shared package teadoc.core;
+shared package teadoc.core.core ;
