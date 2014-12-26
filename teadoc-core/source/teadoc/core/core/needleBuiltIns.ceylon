@@ -5,25 +5,24 @@ import ceylon.language.meta.model { ... }
  
  */
 class DoInjection(shared Injection wrapped) 
-		satisfies Needle {
+satisfies Needle {
 	shared actual Object inject(InjectRequest rq) => wrapped(rq) ;
 }
 
 class FixedValue(Object v)
-		satisfies Needle 
-{
+satisfies Needle {
 	shared actual Object inject(InjectRequest rq) => v ;
 }
 
 class ErrorInjection()
-		satisfies Needle {
+satisfies Needle {
 	shared actual Object inject(InjectRequest rq) {
 		throw InvocationException("erroroneous needle cannot be injected") ;
 	}
 }
 
 class NoArgType(Class type)
-		satisfies  Needle {
+satisfies Needle {
 	shared actual Object inject(InjectRequest rq) {
 		if ( exists bean = type.apply([]) ) {
 			return bean ;
@@ -36,8 +35,7 @@ class NoArgType(Class type)
 
 abstract class BaseSetterInjection<BT,VT>(
 	shared Class<BT> beanType, shared Class<VT> valueType, shared String propertyName
-) satisfies PostProcessor 
-{
+) satisfies PostProcessor {
 	shared String methodName = "set``propertyName.span(0,1).uppercased````propertyName.rest``" ;
 	
 	BT toBeanType(Object bean) {
@@ -69,7 +67,7 @@ abstract class BaseSetterInjection<BT,VT>(
 }
 
 class SetToValue<BT,VT>(Class<BT> beanType, Class<VT> valueType, String property, shared VT val)
-		extends BaseSetterInjection<BT, VT>(beanType,valueType,property) {
+extends BaseSetterInjection<BT, VT>(beanType,valueType,property) {
 	shared actual VT derivePropertyValue(InjectRequest rq) => val ;
 }
 
@@ -92,7 +90,7 @@ class SetToValue<BT,VT>(Class<BT> beanType, Class<VT> valueType, String property
 //}
 
 class SetToNeedle<BT,VT>(Class<BT> beanType, Class<VT> valueType, String property, shared Needle needle)
-		extends BaseSetterInjection<BT, VT>(beanType, valueType, property) {
+extends BaseSetterInjection<BT, VT>(beanType, valueType, property) {
 	
 	shared actual VT derivePropertyValue(InjectRequest rq) {
 		Object needleValue = needle.inject(rq) ;

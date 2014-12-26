@@ -20,6 +20,9 @@ class InjectRequest(
 interface Needle 
 satisfies Identifiable {
 	shared formal Object inject(InjectRequest rq) ;
+
+	//TODO: allow this to take in a sequence of post processing, instead of just one.
+	//	will create more efficent data struct internally
 	shared Needle with(PostProcessor | PostProcessing pp) => PostProcessed(this,{pp}) ;
 }
 
@@ -27,8 +30,11 @@ interface PostProcessor {
 	shared formal Object postProcess(Object bean, InjectRequest rq) ;
 }
 
+/**
+ 	needle with post processing
+*/
 class PostProcessed(Needle wrapped, {PostProcessor | PostProcessing+} postProcessors)
-		satisfies Needle {
+satisfies Needle {
 	shared actual Object inject(InjectRequest rq) {
 		variable Object bean = wrapped.inject(rq) ;
 		for (pp in postProcessors) { 
@@ -39,6 +45,9 @@ class PostProcessed(Needle wrapped, {PostProcessor | PostProcessing+} postProces
 	}
 }
 
+/**
+	a teadoc scalar is a binding between an injection/needle and the cached resolved value of that needle once it is executed
+*/
 class TeadocScalar(shared Needle initNeedle, shared Object? initValue = null) {
 	variable Object? injectValue = initValue ;
 	variable Needle currentNeedle = initNeedle ;
