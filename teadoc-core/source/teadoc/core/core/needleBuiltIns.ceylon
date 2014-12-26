@@ -1,68 +1,29 @@
-
 import ceylon.language.meta.model { ... }
 
 /*
- top level generic definitions
-
-*/
-
-alias Injection => Object(InjectRequest) ;
-alias PostProcessing => Object(Object, InjectRequest) ;
-
-class InjectRequest(
-	shared TeadocKey key, 
-	shared TeadocPattern pattern, 
-	shared TeadocContext context
-) {
-	shared [String*] keyVariables => pattern.extractFromKey(key) ;
-}
-
-interface Needle 
-satisfies Identifiable {
-	shared formal Object inject(InjectRequest rq) ;
-	shared Needle with(PostProcessor | PostProcessing pp) => PostProcessed(this,{pp}) ;
-}
-
-interface PostProcessor {
-	shared formal Object postProcess(Object bean, InjectRequest rq) ;
-}
-
-/*
  specific common use implemenations
-
-*/
+ 
+ */
 class DoInjection(shared Injection wrapped) 
-satisfies Needle {
+		satisfies Needle {
 	shared actual Object inject(InjectRequest rq) => wrapped(rq) ;
 }
 
 class FixedValue(Object v)
-satisfies Needle 
+		satisfies Needle 
 {
 	shared actual Object inject(InjectRequest rq) => v ;
 }
 
 class ErrorInjection()
-satisfies Needle {
+		satisfies Needle {
 	shared actual Object inject(InjectRequest rq) {
 		throw InvocationException("erroroneous needle cannot be injected") ;
 	}
 }
 
-class PostProcessed(Needle wrapped, {PostProcessor | PostProcessing+} postProcessors)
-satisfies Needle {
-	shared actual Object inject(InjectRequest rq) {
-		variable Object bean = wrapped.inject(rq) ;
-		for (pp in postProcessors) { 
-			if (is PostProcessor pp) { bean = pp.postProcess(bean,rq) ; }
-			else if (is PostProcessing pp) { bean = pp(bean,rq) ; }
-		}
-		return bean ;
-	}
-}
-
 class NoArgType(Class type)
-satisfies  Needle {
+		satisfies  Needle {
 	shared actual Object inject(InjectRequest rq) {
 		if ( exists bean = type.apply([]) ) {
 			return bean ;
@@ -78,7 +39,7 @@ abstract class BaseSetterInjection<BT,VT>(
 ) satisfies PostProcessor 
 {
 	shared String methodName = "set``propertyName.span(0,1).uppercased````propertyName.rest``" ;
-
+	
 	BT toBeanType(Object bean) {
 		if (is BT bean) {
 			return bean ;
@@ -87,20 +48,20 @@ abstract class BaseSetterInjection<BT,VT>(
 			throw InitializationException("provided object ``bean`` is not of class ``beanType``") ;
 		}
 	}
-
+	
 	shared formal VT derivePropertyValue(InjectRequest rq) ;
-
+	
 	shared actual Object postProcess(Object bean, InjectRequest rq) {
 		BT trueBean = toBeanType(bean) ;
 		VT propertyValue = derivePropertyValue(rq) ;
 		Method<BT,Anything,[VT]>? setterMethod = beanType.getDeclaredMethod<BT,Anything,[VT]>(methodName) ;
-
+		
 		if (exists setterMethod) {
 			Function<Anything,[VT]> binding = setterMethod(trueBean) ;
 			binding(propertyValue) ;
 			return bean ;
 		}
-
+		
 		else {
 			throw InitializationException("can't find indicated method ``methodName`` of class ``beanType``") ;
 		}
@@ -108,7 +69,7 @@ abstract class BaseSetterInjection<BT,VT>(
 }
 
 class SetToValue<BT,VT>(Class<BT> beanType, Class<VT> valueType, String property, shared VT val)
-extends BaseSetterInjection<BT, VT>(beanType,valueType,property) {
+		extends BaseSetterInjection<BT, VT>(beanType,valueType,property) {
 	shared actual VT derivePropertyValue(InjectRequest rq) => val ;
 }
 
@@ -131,7 +92,7 @@ extends BaseSetterInjection<BT, VT>(beanType,valueType,property) {
 //}
 
 class SetToNeedle<BT,VT>(Class<BT> beanType, Class<VT> valueType, String property, shared Needle needle)
-extends BaseSetterInjection<BT, VT>(beanType, valueType, property) {
+		extends BaseSetterInjection<BT, VT>(beanType, valueType, property) {
 	
 	shared actual VT derivePropertyValue(InjectRequest rq) {
 		Object needleValue = needle.inject(rq) ;

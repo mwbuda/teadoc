@@ -8,40 +8,6 @@ interface TeadocLoadout {
 	shared formal void loadContext(PatternType? root, TeadocContext cxt) ;
 }
 
-class TeadocScalar(shared Needle initNeedle, shared Object? initValue = null) {
-	variable Object? injectValue = initValue ;
-	variable Needle currentNeedle = initNeedle ;
-	shared Needle needle => currentNeedle ;
-	shared Object? currentValue => injectValue ;
-
-	shared void rebindNeedle(Needle nn) {
-		if ( currentNeedle != nn ) {
-			clear() ;
-			currentNeedle = nn ;
-		}
-	}
-
-	shared Object load(InjectRequest rq) {
-		Object? v = injectValue ; 
-		if (exists v) {
-			return v ;
-		}
-		else {
-			return reload(rq) ;
-		}
-	}
-
-	shared Object reload(InjectRequest rq) {
-		Object v = needle.inject(rq) ;
-		injectValue = v ;
-		return v ;
-	}
-
-	shared void clear() {
-		injectValue = null ; 
-	}
-}
-
 class TeadocContext() 
 satisfies TeadocLoadout {
 	
