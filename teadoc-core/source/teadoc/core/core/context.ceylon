@@ -26,14 +26,14 @@ satisfies TeadocLoadout {
 		TeadocScalar? currRecord = bindingMappings.get(key) ;
 		Boolean haveRecord = !(currRecord is Null) ;
 		
-		[TeadocPattern*] ellibiblePatterns = patternSchema.elligiblePatterns(key, defineMappings.keys) ;
-		Boolean havePattern = !(ellibiblePatterns[0] is Null) ;
+		[TeadocPattern*] elligiblePatterns = patternSchema.elligiblePatterns(key, defineMappings.keys) ;
+		Boolean havePattern = !(elligiblePatterns[0] is Null) ;
 		
 		if (!haveRecord && !havePattern) {
 			return null ;
 		}
 		
-		TeadocPattern pattern = ellibiblePatterns[0] else patternSchema.compilePattern(key) ;
+		TeadocPattern pattern = elligiblePatterns[0] else patternSchema.compilePattern(key) ;
 		Needle needle = defineMappings.get(pattern) else ErrorInjection() ;
 		TeadocScalar useRecord = currRecord else TeadocScalar(needle) ;
 		
